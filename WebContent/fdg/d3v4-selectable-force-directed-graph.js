@@ -62,7 +62,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
         .selectAll("line")
         .data(graph.links)
         .enter().append("line")
-        .attr("stroke-width", function(d) { return Math.sqrt(d.str_value); });
+        .attr("stroke-width", function(d) { return Math.sqrt(d.str_val); });
 
     var node = gDraw.append("g")
         .attr("class", "node")

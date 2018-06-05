@@ -1,54 +1,40 @@
 {
-	"nodes": [
-		{
-			"id": 1,
-			"group": 1,
-			"label": "Paris"
-		},
-		{
-			"id": 2,
-			"group": 2,
-			"label": "London"
-		},
-		{
-			"id": 3,
-			"group": 2,
-			"label": "Berlin"
-		},
-		{
-			"id": 4,
-			"group": 3,
-			"label": "Tokyo"
-		}
-	],
-	"links": [
-		{
-			"id": 1,
-			"source": 1,
-			"target": 2,
-			"str_value": 1,
-			"label": "Distance"
-		},
-		{
-			"id": 2,
-			"source": 1,
-			"target": 3,
-			"str_value": 2,
-			"label": "Distance"
-		},
-		{
-			"id": 3,
-			"source": 2,
-			"target": 4,
-			"str_value": 2,
-			"label": "Distance"
-		},
-		{
-			"id": 4,
-			"source": 3,
-			"target": 4,
-			"str_value": 5,
-			"label": "Distance"
-		}
-	]
+	"nodes": [{
+		"id": 1,
+		"label": "Paris",
+		"group": 1
+	}, {
+		"id": 2,
+		"label": "London",
+		"group": 2
+	}, {
+		"id": 3,
+		"label": "Berlin",
+		"group": 2
+	}, {
+		"id": 4,
+		"label": "Tokyo",
+		"group": 3
+	}],
+	"links": [{
+		"id": 1,
+		"source": 1,
+		"target": 2,
+		"str_val": 1
+	}, {
+		"id": 2,
+		"source": 1,
+		"target": 3,
+		"str_val": 2
+	}, {
+		"id": 3,
+		"source": 2,
+		"target": 4,
+		"str_val": 2
+	}, {
+		"id": 4,
+		"source": 3,
+		"target": 4,
+		"str_val": 5
+	}]
 }
