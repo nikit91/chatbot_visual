@@ -62,7 +62,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
         .selectAll("line")
         .data(graph.links)
         .enter().append("line")
-        .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+        .attr("stroke-width", function(d) { return Math.sqrt(d.str_value); });
 
     var node = gDraw.append("g")
         .attr("class", "node")
@@ -85,8 +85,8 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
     // add titles for mouseover blurbs
     node.append("title")
         .text(function(d) { 
-            if ('name' in d)
-                return d.name;
+            if ('label' in d)
+                return d.label;
             else
                 return d.id; 
         });
@@ -117,7 +117,9 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
     function ticked() {
         // update node and line positions at every step of 
         // the force simulation
-        link.attr("x1", function(d) { return d.source.x; })
+        link.attr("x1", function(d) { 
+        	return d.source.x; 
+        	})
             .attr("y1", function(d) { return d.source.y; })
             .attr("x2", function(d) { return d.target.x; })
             .attr("y2", function(d) { return d.target.y; });
