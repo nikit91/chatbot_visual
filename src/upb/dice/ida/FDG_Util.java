@@ -12,7 +12,11 @@ import com.google.gson.JsonObject;
 public class FDG_Util {
 	public static final GsonBuilder builder = new GsonBuilder();
 	public static final Gson gson = builder.create();
-
+	/**
+	 * Method to convert a list of triples into formatted json data for FDG Visualization
+	 * @param triples - list of triples
+	 * @return jsonobject of data
+	 */
 	public static JsonObject getFDGData(List<FDG_Triple> triples) {
 		JsonObject resData = new JsonObject();
 		JsonArray nodeArr = new JsonArray();
