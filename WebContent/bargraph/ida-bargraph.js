@@ -94,16 +94,13 @@ var bgdata = {
 		avgrent : 4000
 	}, {
 		cityName : 'Delhi',
-		avgrent : 2500
+		avgrent : 700
 	}, {
 		cityName : 'Bengaluru',
-		avgrent : 2000
+		avgrent : 900
 	}, {
 		cityName : 'Paderborn',
-		avgrent : 2450
-	}, {
-		cityName : 'Palika Bazaar',
-		avgrent : 150
+		avgrent : 600
 	} ]
 
 };
