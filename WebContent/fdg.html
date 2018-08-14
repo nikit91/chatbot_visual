@@ -1,33 +1,21 @@
 <!DOCTYPE html>
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<!-- <style>
-
-.axis .domain {
-  display: none;
-}
-
-</style> -->
-<!-- <svg width="960" height="500"></svg>
-
-<script src="./bargraph/bargraph.js"></script> -->
 
 <link rel='stylesheet' href='./fdg/d3v4-selectable-zoomable-force-directed-graph.css'>
 <script src="./fdg/d3v4-brush-lite.js"></script>
 <script src="./fdg/d3v4-selectable-force-directed-graph.js"></script>
 
 
-<div align='center' id="d3_selectable_force_directed_graph" style="width: 960px; height: 500px; margin: auto; margin-bottom: 12px">
-    <svg />
+<div id="fdg1-container" align='center' style="width: 960px; height: 500px; margin: auto; margin-bottom: 12px;border-color: #eaeaea;border-style: solid">
+    <svg id="fdg1" />
 </div>
 
 
 <script>
-    var svg = d3.select('#d3_selectable_force_directed_graph');
-
-    d3.json('./fdg/demo.json', function(error, graph) {
+	
+    d3.json('./fdg/miserables.with-ids.json', function(error, graph) {
         if (!error) {
-            //console.log('graph', graph);
-            createV4SelectableForceDirectedGraph(svg, graph);
+            createV4SelectableForceDirectedGraph('#fdg1','#fdg1-container', graph);
         } else {
             console.error(error);
         }
