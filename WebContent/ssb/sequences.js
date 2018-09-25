@@ -1,17 +1,88 @@
-// Dimensions of sunburst.
-var width = 750;
-var height = 600;
-var radius = Math.min(width, height) / 2;
-
-// Breadcrumb dimensions: width, height, spacing, width of tip/tail.
-var b = {
-  w: 75, h: 30, s: 3, t: 10
-};
-function getColor(d){
-	  r = 120 + d*2;
-	  b = r + (d * 7) % (r==256?256:(256-r));
-	  g = b + (d * 8) % (r==128?128:(128-r));
-	  return rgb2hex('rgb(' + r + ',' + g + ',' + b + ')');
+setTimeout(function(){ 
+	// Use d3.text and d3.csvParseRows so that we do not need to have a header
+	// row, and can receive the csv as an array of arrays.
+	d3.text("./ssb/rangseq_ssb.csv", function(text) {
+	  var csv = d3.csvParseRows(text);
+	  var json = buildHierarchy(csv);
+	  initGlobalVars();
+	  createVisualization(json);
+	});
+}, 1000);
+//Ids
+const mainEleId= "#main";
+const sequenceEleId= "#sequence";
+const chartEleId= "#chart";
+const explanationEleId= "#explanation";
+const percentageEleId= "#percentage";
+const sidebarEleId= "#sidebar";
+const togglelegendEleId= "#togglelegend";
+const legendEleId= "#legend";
+//Ids of Programmatically generated elements
+const containerSsbId = "container";
+const containerEleId = "#"+containerSsbId;
+const trailSsbId = "trail";
+const trailEleId = "#"+trailSsbId;
+const endlabelSsbId = "endlabel";
+const endlabelEleId = "#"+endlabelSsbId;
+//TODO: Function to init Ids
+// Function to init variables
+var width, height, radius, b, colors, totalSize, vis, partition, arc;
+var ssbUniqueSeqNames;
+function initGlobalVars(){
+	// Dimensions of sunburst.
+	width = d3.select(chartEleId).node().clientWidth;
+	height = d3.select(chartEleId).node().clientHeight;
+	radius = Math.min(width, height) / 2;
+	
+	// Breadcrumb dimensions: width, height, spacing, width of tip/tail.
+	b = {
+	  w: 75, h: 30, s: 3, t: 10
+	};
+	
+	//Mapping of step names to colors.
+	// Mapping of step names to colors.
+	colors = {};
+	for(let i=0; i<ssbUniqueSeqNames.length;i++){
+		colors[ssbUniqueSeqNames[i]] = getSsbColor(i);
+	}
+	/*colors = {
+	  "end": "#7c8a8a", 
+	  3: "#7e9393", 
+	  4: "#80bc9c", 
+	  5: "#82a5a5", 
+	  6: "#84aeae", 
+	  7: "#86b9b7", 
+	  8: "#88c0c0", 
+	  9: "#8acbc9", 
+	  10: "#8cdad2",
+	  11: "#8edfdb", 
+	  12: "#90e4e4"
+	};*/
+	
+	// Total size of all segments; we set this later, after loading the data.
+	totalSize = 0; 
+	
+	vis = d3.select(chartEleId).append("svg:svg")
+	    .attr("width", width)
+	    .attr("height", height)
+	    .append("svg:g")
+	    .attr("id", containerSsbId)
+	    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+	
+	partition = d3.partition()
+	    .size([2 * Math.PI, radius * radius]);
+	
+	arc = d3.arc()
+	    .startAngle(function(d) { return d.x0; })
+	    .endAngle(function(d) { return d.x1; })
+	    .innerRadius(function(d) { return Math.sqrt(d.y0); })
+	    .outerRadius(function(d) { return Math.sqrt(d.y1); });
+}
+function getSsbColor(d){
+	  let redColVal = 120 + d*2;
+	  let blueColVal = redColVal + (d * 7) % (redColVal==256?256:(256-redColVal));
+	  let greenColVal = blueColVal + (d * 8) % (redColVal==128?128:(128-redColVal));
+	  return rgb2hex('rgb(' + redColVal + ',' + greenColVal + ',' + blueColVal + ')');
 	}
 function rgb2hex(rgb){
 	 rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
@@ -20,56 +91,13 @@ function rgb2hex(rgb){
 	  ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
 	  ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
 	}
-//Mapping of step names to colors.
-// Mapping of step names to colors.
-var colors = {
-  "end": "#7c8a8a", 
-  3: "#7e9393", 
-  4: "#80bc9c", 
-  5: "#82a5a5", 
-  6: "#84aeae", 
-  7: "#86b9b7", 
-  8: "#88c0c0", 
-  9: "#8acbc9", 
-  10: "#8cdad2",
-  11: "#8edfdb", 
-  12: "#90e4e4"
-};
-
-// Total size of all segments; we set this later, after loading the data.
-var totalSize = 0; 
-
-var vis = d3.select("#chart").append("svg:svg")
-    .attr("width", width)
-    .attr("height", height)
-    .append("svg:g")
-    .attr("id", "container")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-var partition = d3.partition()
-    .size([2 * Math.PI, radius * radius]);
-
-var arc = d3.arc()
-    .startAngle(function(d) { return d.x0; })
-    .endAngle(function(d) { return d.x1; })
-    .innerRadius(function(d) { return Math.sqrt(d.y0); })
-    .outerRadius(function(d) { return Math.sqrt(d.y1); });
-
-// Use d3.text and d3.csvParseRows so that we do not need to have a header
-// row, and can receive the csv as an array of arrays.
-d3.text("./ssb/ssrangseq.csv", function(text) {
-  var csv = d3.csvParseRows(text);
-  var json = buildHierarchy(csv);
-  createVisualization(json);
-});
-
 // Main function to draw and set up the visualization, once we have the data.
 function createVisualization(json) {
 
   // Basic setup of page elements.
   initializeBreadcrumbTrail();
   drawLegend();
-  d3.select("#togglelegend").on("click", toggleLegend);
+  d3.select(togglelegendEleId).on("click", toggleLegend);
 
   // Bounding circle underneath the sunburst, to make it easier to detect
   // when the mouse leaves the parent g.
@@ -99,7 +127,7 @@ function createVisualization(json) {
       .on("mouseover", mouseover);
 
   // Add the mouseleave handler to the bounding circle.
-  d3.select("#container").on("mouseleave", mouseleave);
+  d3.select(containerEleId).on("mouseleave", mouseleave);
 
   // Get total size of the tree = value of root node from partition.
   totalSize = path.datum().value;
@@ -114,11 +142,10 @@ function mouseover(d) {
     percentageString = "< 0.1%";
   }
 
-  d3.select("#percentage")
+  d3.select(percentageEleId)
       .text(percentageString);
 
-  d3.select("#explanation")
-      .style("visibility", "");
+  d3.select(explanationEleId).classed("ssb-hide",false);
 
   var sequenceArray = d.ancestors().reverse();
   sequenceArray.shift(); // remove root node from the array
@@ -140,7 +167,7 @@ function mouseover(d) {
 function mouseleave(d) {
 
   // Hide the breadcrumb trail
-  d3.select("#trail")
+  d3.select(trailEleId)
       .style("visibility", "hidden");
 
   // Deactivate all segments during transition.
@@ -155,19 +182,18 @@ function mouseleave(d) {
               d3.select(this).on("mouseover", mouseover);
             });
 
-  d3.select("#explanation")
-      .style("visibility", "hidden");
+  d3.select(explanationEleId).classed("ssb-hide", true);
 }
 
 function initializeBreadcrumbTrail() {
   // Add the svg area.
-  var trail = d3.select("#sequence").append("svg:svg")
+  var trail = d3.select(sequenceEleId).append("svg:svg")
       .attr("width", width)
       .attr("height", 50)
-      .attr("id", "trail");
+      .attr("id", trailSsbId);
   // Add the label at the end, for the percentage.
   trail.append("svg:text")
-    .attr("id", "endlabel")
+    .attr("id", endlabelSsbId)
     .style("fill", "#000");
 }
 
@@ -189,7 +215,7 @@ function breadcrumbPoints(d, i) {
 function updateBreadcrumbs(nodeArray, percentageString) {
 
   // Data join; key function combines name and depth (= position in sequence).
-  var trail = d3.select("#trail")
+  var trail = d3.select(trailEleId)
       .selectAll("g")
       .data(nodeArray, function(d) { return d.data.name + d.depth; });
 
@@ -216,7 +242,7 @@ function updateBreadcrumbs(nodeArray, percentageString) {
   });
 
   // Now move and update the percentage at the end.
-  d3.select("#trail").select("#endlabel")
+  d3.select(trailEleId).select(endlabelEleId)
       .attr("x", (nodeArray.length + 0.5) * (b.w + b.s))
       .attr("y", b.h / 2)
       .attr("dy", "0.35em")
@@ -224,7 +250,7 @@ function updateBreadcrumbs(nodeArray, percentageString) {
       .text(percentageString);
 
   // Make the breadcrumb trail visible, if it's hidden.
-  d3.select("#trail")
+  d3.select(trailEleId)
       .style("visibility", "");
 
 }
@@ -236,7 +262,7 @@ function drawLegend() {
     w: 75, h: 30, s: 3, r: 3
   };
 
-  var legend = d3.select("#legend").append("svg:svg")
+  var legend = d3.select(legendEleId).append("svg:svg")
       .attr("width", li.w)
       .attr("height", d3.keys(colors).length * (li.h + li.s));
 
@@ -263,11 +289,11 @@ function drawLegend() {
 }
 
 function toggleLegend() {
-  var legend = d3.select("#legend");
+  var legend = d3.select(legendEleId);
   if (legend.style("visibility") == "hidden") {
-    legend.style("visibility", "");
+	  legend.classed('ssb-hide',false)
   } else {
-    legend.style("visibility", "hidden");
+	  legend.classed('ssb-hide',true)
   }
 }
 
@@ -276,6 +302,7 @@ function toggleLegend() {
 // root to leaf, separated by hyphens. The second column is a count of how 
 // often that sequence occurred.
 function buildHierarchy(csv) {
+  let nameArr = [];
   var root = {"name": "root", "children": []};
   for (var i = 0; i < csv.length; i++) {
     var sequence = csv[i][0];
@@ -288,6 +315,8 @@ function buildHierarchy(csv) {
     for (var j = 0; j < parts.length; j++) {
       var children = currentNode["children"];
       var nodeName = parts[j];
+      // Pushing all the names in an array
+      nameArr.push(nodeName);
       var childNode;
       if (j + 1 < parts.length) {
    // Not yet at the end of the sequence; move down the tree.
@@ -312,5 +341,11 @@ function buildHierarchy(csv) {
       }
     }
   }
+  //keeping only the unique names
+  ssbUniqueSeqNames = nameArr.filter( onlyUnique );
   return root;
 };
+
+function onlyUnique(value, index, self) { 
+    return self.indexOf(value) === index;
+}

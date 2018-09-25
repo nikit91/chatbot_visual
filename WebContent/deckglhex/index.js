@@ -4,7 +4,7 @@ var deckobj = new deck.DeckGL({
   mapStyle: 'https://free.tilehosting.com/styles/positron/style.json?key=U0iNgiZKlYdwvgs9UPm1',
   longitude: -122.402,
   latitude: 37.79,
-  zoom: 11,
+  zoom: 8,
   bearing: 0,
   pitch: 60,
   layers: [
@@ -13,8 +13,8 @@ var deckobj = new deck.DeckGL({
         data: demdata,
         pickable: true,
         extruded: true,
-        radius: 200,
-        elevationScale: 4,
+        radius: 2000,
+        elevationScale: 40,
         getPosition: d => d.COORDINATES,
         onHover: ({object}) => demoTooltip(object)
         /*onHover: ({object}) => setTooltip(`${object.centroid.join(', ')}\nCount: ${object.points.length}`)*/
